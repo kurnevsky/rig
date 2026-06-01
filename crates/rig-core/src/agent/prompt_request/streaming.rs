@@ -1611,7 +1611,8 @@ where
 
                 // Add text, reasoning, and tool calls to chat history.
                 // OpenAI Responses API requires reasoning items to precede function_call items.
-                if !tool_calls.is_empty() || !accumulated_reasoning.is_empty() {
+                let has_reasoning = !accumulated_reasoning.is_empty();
+                if !tool_calls.is_empty() || has_reasoning {
                     // Text before tool calls so the model sees its own prior output.
                     let mut content_items = assistant_text_items_from_choice(&final_turn_content);
 
@@ -1634,7 +1635,7 @@ where
                     new_messages.push(tool_result_to_user_message(id, call_id, tool_result));
                 }
 
-                if !saw_tool_call_this_turn {
+                if !saw_tool_call_this_turn && !has_reasoning {
                     // Add user message and assistant response to history before finishing
                     if !is_empty_assistant_choice(&final_turn_content) {
                         new_messages.push(Message::Assistant {
